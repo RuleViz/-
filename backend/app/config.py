@@ -12,6 +12,11 @@ class Settings(BaseSettings):
     # Server
     host: str = "0.0.0.0"
     port: int = 8000
+
+    # Resume
+    resume_storage_path: str = "./data/resumes"
+    resume_max_file_size_mb: int = 10
+    resume_allowed_extensions: str = "pdf,doc,docx,txt"
     
     class Config:
         env_file = ".env"

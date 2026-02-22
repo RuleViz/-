@@ -140,3 +140,103 @@ class LLMTestResponse(BaseModel):
     success: bool
     message: str
     model_info: Optional[Dict[str, Any]] = None
+
+
+# ============= Resume & Matching Schemas =============
+
+class ResumeUploadResponse(BaseModel):
+    resume_id: int
+    status: str
+
+
+class ResumeExtractedFields(BaseModel):
+    name: Optional[str] = None
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    skills: List[str] = []
+    experiences: List[Dict[str, Any]] = []
+    education: List[str] = []
+    keywords: List[str] = []
+
+
+class ResumeParsed(BaseModel):
+    resume_id: int
+    status: str
+    parsed_fields: ResumeExtractedFields
+    parsed_json: Dict[str, Any]
+    version: int = 1
+
+
+class ResumeSummary(BaseModel):
+    id: int
+    user_id: str
+    filename: str
+    status: str
+    uploaded_at: datetime
+    updated_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class MatchRequest(BaseModel):
+    resume_id: int
+    top_n: int = Field(default=3, ge=1, le=20)
+    filters: Optional[Dict[str, Any]] = None
+
+
+class MatchItem(BaseModel):
+    job_id: int
+    score: float
+    highlights: List[str] = []
+    template_recommendation: Optional[str] = None
+
+
+class DeliveryPrepareRequest(BaseModel):
+    user_id: str = "default_user"
+    resume_id: int
+    job_ids: List[int]
+    config: Dict[str, Any] = {}
+
+
+class DeliveryPrepareResponse(BaseModel):
+    delivery_job_id: int
+    status: str
+
+
+class DeliveryLogItem(BaseModel):
+    id: int
+    job_id: int
+    resume_id: Optional[int] = None
+    simulated_status: str
+    note: Optional[str] = None
+    timestamp: datetime
+    template_name: Optional[str] = None
+    attachment_names: Optional[List[str]] = None
+    failure_reason: Optional[str] = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class DeliveryJobDetail(BaseModel):
+    id: int
+    user_id: str
+    resume_id: Optional[int] = None
+    job_ids: List[int]
+    config: Optional[Dict[str, Any]] = None
+    status: str
+    created_at: datetime
+    updated_at: datetime
+    logs: List[DeliveryLogItem] = []
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class DeliveryAnalyticsItem(BaseModel):
+    key: str
+    count: int
+
+
+class ResumeFixRequest(BaseModel):
+    parsed_fields: Dict[str, Any]
+    note: Optional[str] = None
+
